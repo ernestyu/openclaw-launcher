@@ -1,0 +1,11 @@
+services:
+  openclaw:
+    image: ernestyu/openclaw-patched:latest
+    pull_policy: daily
+    container_name: openclaw
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/home/node/.openclaw
+      - ./ssh:/home/node/.ssh:ro
