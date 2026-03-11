@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_BASE="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/openclaw-launcher/main"
-COMPOSE_URL="${REPO_BASE}/assets/compose-headless.yamll"
+REPO_BASE="https://raw.githubusercontent.com/ernestyu/openclaw-launcher/main"
+COMPOSE_URL="${REPO_BASE}/assets/compose-headless.yaml"
 ENV_EXAMPLE_URL="${REPO_BASE}/assets/.env.example"
 
 info() {
@@ -66,8 +66,8 @@ prepare_files() {
   mkdir -p "$INSTALL_DIR"
   mkdir -p "$INSTALL_DIR/data"
 
-  info "Downloading compose-headless.yamll"
-  download_file "$COMPOSE_URL" "$INSTALL_DIR/compose-headless.yamll"
+  info "Downloading compose-headless.yaml"
+  download_file "$COMPOSE_URL" "$INSTALL_DIR/compose-headless.yaml"
 
   info "Downloading .env.example"
   download_file "$ENV_EXAMPLE_URL" "$INSTALL_DIR/.env.example"
@@ -101,10 +101,10 @@ maybe_edit_env() {
 
 start_service() {
   info "Pulling image"
-  docker compose -f "$INSTALL_DIR/compose-headless.yamll" pull
+  docker compose -f "$INSTALL_DIR/compose-headless.yaml" pull
 
   info "Starting OpenClaw"
-  docker compose -f "$INSTALL_DIR/compose-headless.yamll" up -d
+  docker compose -f "$INSTALL_DIR/compose-headless.yaml" up -d
 }
 
 show_summary {

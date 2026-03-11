@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$RepoBase = "https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/openclaw-launcher/main"
+$RepoBase = "https://raw.githubusercontent.com/ernestyu/openclaw-launcher/main"
 $ComposeUrl = "$RepoBase/assets/compose-webui.yaml"
 $EnvExampleUrl = "$RepoBase/assets/.env.example"
 
