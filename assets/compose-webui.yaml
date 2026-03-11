@@ -1,0 +1,12 @@
+services:
+  openclaw:
+    image: ernestyu/openclaw-patched:latest
+    pull_policy: daily
+    container_name: openclaw
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/home/node/.openclaw
+    ports:
+      - "127.0.0.1:3060:3000"

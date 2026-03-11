@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $RepoBase = "https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/openclaw-launcher/main"
-$ComposeUrl = "$RepoBase/assets/compose.yaml"
+$ComposeUrl = "$RepoBase/assets/compose-webui.yaml"
 $EnvExampleUrl = "$RepoBase/assets/.env.example"
 
 function Info($Message) {
@@ -53,8 +53,8 @@ function Prepare-Files {
     New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
     New-Item -ItemType Directory -Force -Path (Join-Path $InstallDir "data") | Out-Null
 
-    Info "Downloading compose.yaml"
-    Invoke-WebRequest -Uri $ComposeUrl -OutFile (Join-Path $InstallDir "compose.yaml")
+    Info "Downloading compose-webui.yaml"
+    Invoke-WebRequest -Uri $ComposeUrl -OutFile (Join-Path $InstallDir "compose-webui.yaml")
 
     Info "Downloading .env.example"
     Invoke-WebRequest -Uri $EnvExampleUrl -OutFile (Join-Path $InstallDir ".env.example")
@@ -81,7 +81,7 @@ function Maybe-Edit-Env {
 }
 
 function Start-Service {
-    $composeFile = Join-Path $InstallDir "compose.yaml"
+    $composeFile = Join-Path $InstallDir "compose-webui.yaml"
     Info "Pulling image"
     docker compose -f $composeFile pull
 

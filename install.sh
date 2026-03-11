@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_BASE="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/openclaw-launcher/main"
-COMPOSE_URL="${REPO_BASE}/assets/compose.yaml"
+COMPOSE_URL="${REPO_BASE}/assets/compose-headless.yamll"
 ENV_EXAMPLE_URL="${REPO_BASE}/assets/.env.example"
 
 info() {
@@ -66,8 +66,8 @@ prepare_files() {
   mkdir -p "$INSTALL_DIR"
   mkdir -p "$INSTALL_DIR/data"
 
-  info "Downloading compose.yaml"
-  download_file "$COMPOSE_URL" "$INSTALL_DIR/compose.yaml"
+  info "Downloading compose-headless.yamll"
+  download_file "$COMPOSE_URL" "$INSTALL_DIR/compose-headless.yamll"
 
   info "Downloading .env.example"
   download_file "$ENV_EXAMPLE_URL" "$INSTALL_DIR/.env.example"
@@ -101,22 +101,50 @@ maybe_edit_env() {
 
 start_service() {
   info "Pulling image"
-  docker compose -f "$INSTALL_DIR/compose.yaml" pull
+  docker compose -f "$INSTALL_DIR/compose-headless.yamll" pull
 
   info "Starting OpenClaw"
-  docker compose -f "$INSTALL_DIR/compose.yaml" up -d
+  docker compose -f "$INSTALL_DIR/compose-headless.yamll" up -d
 }
 
-show_summary() {
-  printf '\n'
-  info "Install complete."
-  printf 'Install directory: %s\n' "$INSTALL_DIR"
-  printf 'Useful commands:\n'
-  printf '  cd "%s"\n' "$INSTALL_DIR"
-  printf '  docker compose ps\n'
-  printf '  docker compose logs -f\n'
-  printf '  docker compose up -d\n'
-  printf '  docker compose down\n'
+show_summary {
+
+    Write-Host ""
+    Write-Host "----------------------------------------------------"
+    Write-Host "OpenClaw installation completed."
+    Write-Host "----------------------------------------------------"
+    Write-Host ""
+
+    Write-Host "Install directory:"
+    Write-Host "  $InstallDir"
+    Write-Host ""
+
+    Write-Host "Web UI is available at:"
+    Write-Host ""
+    Write-Host "  http://localhost:3060"
+    Write-Host ""
+
+    Write-Host "You can open it in your browser."
+    Write-Host ""
+
+    Write-Host "Useful commands:"
+    Write-Host ""
+    Write-Host "Start:"
+    Write-Host "  docker compose up -d"
+    Write-Host ""
+    Write-Host "Stop:"
+    Write-Host "  docker compose down"
+    Write-Host ""
+    Write-Host "Logs:"
+    Write-Host "  docker compose logs -f"
+    Write-Host ""
+
+    Write-Host "----------------------------------------------------"
+    
+    Write-Host ""
+    Write-Host "Opening browser..."
+    Write-Host ""
+    Start-Process "http://localhost:3060"
 }
 
 main() {
