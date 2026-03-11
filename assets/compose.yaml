@@ -8,4 +8,3 @@ services:
       - .env
     volumes:
       - ./data:/home/node/.openclaw
-      - ./ssh:/home/node/.ssh:ro

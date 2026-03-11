@@ -65,7 +65,6 @@ ask_install_dir() {
 prepare_files() {
   mkdir -p "$INSTALL_DIR"
   mkdir -p "$INSTALL_DIR/data"
-  mkdir -p "$INSTALL_DIR/ssh"
 
   info "Downloading compose.yaml"
   download_file "$COMPOSE_URL" "$INSTALL_DIR/compose.yaml"
@@ -79,25 +78,6 @@ prepare_files() {
   else
     info ".env already exists, keeping existing file"
   fi
-}
-
-maybe_copy_ssh() {
-  printf "Copy your ~/.ssh into %s/ssh now? [y/N]: " "$INSTALL_DIR"
-  read -r reply
-  case "$reply" in
-    [yY][eE][sS]|[yY])
-      if [[ -d "$HOME/.ssh" ]]; then
-        cp -a "$HOME/.ssh/." "$INSTALL_DIR/ssh/"
-        chmod 700 "$INSTALL_DIR/ssh" || true
-        info "Copied ~/.ssh"
-      else
-        warn "~/.ssh not found, skipping"
-      fi
-      ;;
-    *)
-      info "Skipping SSH copy"
-      ;;
-  esac
 }
 
 maybe_edit_env() {
@@ -132,17 +112,17 @@ show_summary() {
   info "Install complete."
   printf 'Install directory: %s\n' "$INSTALL_DIR"
   printf 'Useful commands:\n'
-  printf '  docker compose -f "%s/compose.yaml" ps\n' "$INSTALL_DIR"
-  printf '  docker compose -f "%s/compose.yaml" logs -f\n' "$INSTALL_DIR"
-  printf '  docker compose -f "%s/compose.yaml" up -d\n' "$INSTALL_DIR"
-  printf '  docker compose -f "%s/compose.yaml" down\n' "$INSTALL_DIR"
+  printf '  cd "%s"\n' "$INSTALL_DIR"
+  printf '  docker compose ps\n'
+  printf '  docker compose logs -f\n'
+  printf '  docker compose up -d\n'
+  printf '  docker compose down\n'
 }
 
 main() {
   check_docker
   ask_install_dir
   prepare_files
-  maybe_copy_ssh
   maybe_edit_env
   start_service
   show_summary

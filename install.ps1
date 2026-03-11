@@ -52,7 +52,6 @@ function Ask-InstallDir {
 function Prepare-Files {
     New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
     New-Item -ItemType Directory -Force -Path (Join-Path $InstallDir "data") | Out-Null
-    New-Item -ItemType Directory -Force -Path (Join-Path $InstallDir "ssh") | Out-Null
 
     Info "Downloading compose.yaml"
     Invoke-WebRequest -Uri $ComposeUrl -OutFile (Join-Path $InstallDir "compose.yaml")
@@ -68,21 +67,6 @@ function Prepare-Files {
         Info "Created .env from .env.example"
     } else {
         Info ".env already exists, keeping existing file"
-    }
-}
-
-function Maybe-Copy-Ssh {
-    $reply = Read-Host "Copy your ~/.ssh into $InstallDir\ssh now? [y/N]"
-    if ($reply -match '^(y|yes)$') {
-        $userSsh = Join-Path $HOME ".ssh"
-        if (Test-Path $userSsh) {
-            Copy-Item (Join-Path $userSsh "*") (Join-Path $InstallDir "ssh") -Recurse -Force -ErrorAction SilentlyContinue
-            Info "Copied ~/.ssh"
-        } else {
-            Warn "~/.ssh not found, skipping"
-        }
-    } else {
-        Info "Skipping SSH copy"
     }
 }
 
@@ -110,16 +94,16 @@ function Show-Summary {
     Info "Install complete."
     Write-Host "Install directory: $InstallDir"
     Write-Host "Useful commands:"
-    Write-Host "  docker compose -f `"$InstallDir\compose.yaml`" ps"
-    Write-Host "  docker compose -f `"$InstallDir\compose.yaml`" logs -f"
-    Write-Host "  docker compose -f `"$InstallDir\compose.yaml`" up -d"
-    Write-Host "  docker compose -f `"$InstallDir\compose.yaml`" down"
+    Write-Host "  cd `"$InstallDir`""
+    Write-Host "  docker compose ps"
+    Write-Host "  docker compose logs -f"
+    Write-Host "  docker compose up -d"
+    Write-Host "  docker compose down"
 }
 
 Check-Docker
 Ask-InstallDir
 Prepare-Files
-Maybe-Copy-Ssh
 Maybe-Edit-Env
 Start-Service
 Show-Summary
