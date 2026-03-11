@@ -59,13 +59,12 @@ iwr https://raw.githubusercontent.com/ernestyu/openclaw-launcher/main/install.ps
 
 1. 检查 Docker 是否已经安装并运行
 2. 询问安装目录
-3. 下载 `compose.yaml`
+3. 下载对应的 Compose 文件（Linux/macOS 为 `compose-headless.yaml`，Windows 为 `compose-webui.yaml`）
 4. 下载 `.env.example`
 5. 创建 `.env`
-6. 创建 `data/` 和 `ssh/` 目录
-7. 可选地复制你本地的 `~/.ssh`
-8. 拉取镜像
-9. 启动 OpenClaw
+6. 创建 `data/` 目录
+7. 拉取镜像
+8. 启动 OpenClaw
 
 ---
 
@@ -73,7 +72,8 @@ iwr https://raw.githubusercontent.com/ernestyu/openclaw-launcher/main/install.ps
 
 这个仓库刻意保持得很简单，只包含少量文件：
 
-* `assets/compose.yaml`
+* `assets/compose-headless.yaml`（Linux/macOS 安装脚本使用）
+* `assets/compose-webui.yaml`（Windows 安装脚本使用）
 * `assets/.env.example`
 * `install.sh`
 * `install.ps1`

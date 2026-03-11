@@ -66,13 +66,12 @@ The installer will:
 
 1. Check that Docker is installed and running
 2. Ask for an install directory
-3. Download `compose.yaml`
+3. Download a Compose file (`compose-headless.yaml` on Linux/macOS, `compose-webui.yaml` on Windows)
 4. Download `.env.example`
 5. Create `.env`
-6. Create `data/` and `ssh/`
-7. Optionally copy your local `~/.ssh`
-8. Pull the image
-9. Start OpenClaw
+6. Create `data/`
+7. Pull the image
+8. Start OpenClaw
 
 ---
 
@@ -80,7 +79,8 @@ The installer will:
 
 This repository contains only a few files:
 
-* `assets/compose.yaml`
+* `assets/compose-headless.yaml` (used by the Linux/macOS installer)
+* `assets/compose-webui.yaml` (used by the Windows installer)
 * `assets/.env.example`
 * `install.sh`
 * `install.ps1`

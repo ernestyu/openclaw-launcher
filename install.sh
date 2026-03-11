@@ -107,44 +107,19 @@ start_service() {
   docker compose -f "$INSTALL_DIR/compose-headless.yaml" up -d
 }
 
-show_summary {
-
-    Write-Host ""
-    Write-Host "----------------------------------------------------"
-    Write-Host "OpenClaw installation completed."
-    Write-Host "----------------------------------------------------"
-    Write-Host ""
-
-    Write-Host "Install directory:"
-    Write-Host "  $InstallDir"
-    Write-Host ""
-
-    Write-Host "Web UI is available at:"
-    Write-Host ""
-    Write-Host "  http://localhost:3060"
-    Write-Host ""
-
-    Write-Host "You can open it in your browser."
-    Write-Host ""
-
-    Write-Host "Useful commands:"
-    Write-Host ""
-    Write-Host "Start:"
-    Write-Host "  docker compose up -d"
-    Write-Host ""
-    Write-Host "Stop:"
-    Write-Host "  docker compose down"
-    Write-Host ""
-    Write-Host "Logs:"
-    Write-Host "  docker compose logs -f"
-    Write-Host ""
-
-    Write-Host "----------------------------------------------------"
-    
-    Write-Host ""
-    Write-Host "Opening browser..."
-    Write-Host ""
-    Start-Process "http://localhost:3060"
+show_summary() {
+  echo
+  info "OpenClaw installation completed."
+  echo
+  echo "Install directory:"
+  echo "  $INSTALL_DIR"
+  echo
+  echo "Useful commands (run inside the install directory):"
+  echo "  docker compose up -d    # start"
+  echo "  docker compose down     # stop"
+  echo "  docker compose logs -f  # logs"
+  echo
+  echo "This headless compose file does not expose a web UI port by default."
 }
 
 main() {
