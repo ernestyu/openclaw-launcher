@@ -1,7 +1,10 @@
 $ErrorActionPreference = "Stop"
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 $RepoBase = "https://raw.githubusercontent.com/ernestyu/openclaw-launcher/main"
-$ComposeUrl = "$RepoBase/assets/compose-webui.yaml"
+$ComposeWebUiUrl = "$RepoBase/assets/compose-webui.yaml"
+$ComposeHeadlessUrl = "$RepoBase/assets/compose-headless.yaml"
 $EnvExampleUrl = "$RepoBase/assets/.env.example"
 
 function Info($Message) {
@@ -41,6 +44,13 @@ function Check-Docker {
 
 function Ask-InstallDir {
     $defaultDir = Join-Path $HOME "openclaw"
+    $envDir = $env:OPENCLAW_DIR
+
+    if (-not [string]::IsNullOrWhiteSpace($envDir)) {
+        $script:InstallDir = $envDir
+        return
+    }
+
     $inputDir = Read-Host "Install directory [$defaultDir]"
     if ([string]::IsNullOrWhiteSpace($inputDir)) {
         $script:InstallDir = $defaultDir
@@ -49,15 +59,51 @@ function Ask-InstallDir {
     }
 }
 
+function Select-Mode {
+    $envMode = $env:OPENCLAW_MODE
+
+    if (-not [string]::IsNullOrWhiteSpace($envMode)) {
+        $mode = $envMode.ToLowerInvariant()
+    } else {
+        $mode = Read-Host "Install Web UI? [Y/n]"
+    }
+
+    if ([string]::IsNullOrWhiteSpace($mode) -or $mode -match '^(y|yes|webui)$') {
+        $script:ComposeUrl = $ComposeWebUiUrl
+        $script:WebUiEnabled = $true
+        return
+    }
+
+    if ($mode -match '^(n|no|headless)$') {
+        $script:ComposeUrl = $ComposeHeadlessUrl
+        $script:WebUiEnabled = $false
+        return
+    }
+
+    Warn "Invalid OPENCLAW_MODE '$mode'. Using webui."
+    $script:ComposeUrl = $ComposeWebUiUrl
+    $script:WebUiEnabled = $true
+}
+
 function Prepare-Files {
     New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
     New-Item -ItemType Directory -Force -Path (Join-Path $InstallDir "data") | Out-Null
 
-    Info "Downloading compose-webui.yaml"
-    Invoke-WebRequest -Uri $ComposeUrl -OutFile (Join-Path $InstallDir "compose-webui.yaml")
+    $composeFile = Join-Path $InstallDir "compose.yaml"
+
+    Info "Downloading compose.yaml"
+    try {
+        Invoke-WebRequest -Uri $ComposeUrl -OutFile $composeFile -UseBasicParsing
+    } catch {
+        Fail "Failed to download compose file."
+    }
 
     Info "Downloading .env.example"
-    Invoke-WebRequest -Uri $EnvExampleUrl -OutFile (Join-Path $InstallDir ".env.example")
+    try {
+        Invoke-WebRequest -Uri $EnvExampleUrl -OutFile (Join-Path $InstallDir ".env.example") -UseBasicParsing
+    } catch {
+        Fail "Failed to download .env.example."
+    }
 
     $envFile = Join-Path $InstallDir ".env"
     $envExample = Join-Path $InstallDir ".env.example"
@@ -71,6 +117,11 @@ function Prepare-Files {
 }
 
 function Maybe-Edit-Env {
+    if ($env:OPENCLAW_NO_EDIT -eq "1") {
+        Info "Skipping .env editing (OPENCLAW_NO_EDIT=1)"
+        return
+    }
+
     $reply = Read-Host "Open .env for editing now? [y/N]"
     if ($reply -match '^(y|yes)$') {
         $envFile = Join-Path $InstallDir ".env"
@@ -81,18 +132,25 @@ function Maybe-Edit-Env {
 }
 
 function Start-Service {
-    $composeFile = Join-Path $InstallDir "compose-webui.yaml"
+    $composeFile = Join-Path $InstallDir "compose.yaml"
+
     Info "Pulling image"
-    docker compose -f $composeFile pull
+    docker compose -f $composeFile --project-directory $InstallDir pull
 
     Info "Starting OpenClaw"
-    docker compose -f $composeFile up -d
+    docker compose -f $composeFile --project-directory $InstallDir up -d
 }
 
 function Show-Summary {
     Write-Host ""
     Info "Install complete."
     Write-Host "Install directory: $InstallDir"
+
+    if ($WebUiEnabled) {
+        Write-Host "Web UI: http://localhost:3060"
+    }
+
+    Write-Host ""
     Write-Host "Useful commands:"
     Write-Host "  cd `"$InstallDir`""
     Write-Host "  docker compose ps"
@@ -103,6 +161,7 @@ function Show-Summary {
 
 Check-Docker
 Ask-InstallDir
+Select-Mode
 Prepare-Files
 Maybe-Edit-Env
 Start-Service

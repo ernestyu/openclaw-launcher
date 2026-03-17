@@ -1,29 +1,35 @@
+# OpenClaw Launcher
+
+[English](README.md) | [中文](#中文)
+
+---
+
 ## 中文
 
 ### 这个仓库是做什么的
 
-这个仓库提供了一个非常轻量的跨平台启动器，用来启动公开版的 OpenClaw Docker 镜像。
+这个仓库提供一个非常轻量的跨平台启动器，用来启动公开版的 OpenClaw Docker 镜像。
 
-目标就是让普通用户尽量简单地安装：
+目标是让普通用户尽量简单地安装：
 
-* 不需要下载 zip
-* 不需要手动解压
-* 不需要自己写 compose 文件
+- 不需要下载 zip
+- 不需要手动解压
+- 不需要自己写 compose 文件
 
 这个启动器使用的公开镜像是：
 
 `ernestyu/openclaw-patched:latest`
 
-这个镜像本身已经是多平台镜像，所以 Docker 会自动拉取对应平台的版本，例如：
+这个镜像是多平台镜像，Docker 会自动拉取对应平台的版本，例如：
 
-* `linux/amd64`
-* `linux/arm64`
+- `linux/amd64`
+- `linux/arm64`
 
 因此，这个启动器可以同时用于：
 
-* Windows
-* macOS
-* Linux
+- Windows
+- macOS
+- Linux
 
 ---
 
@@ -31,7 +37,7 @@
 
 你的电脑上必须已经安装并启动 Docker。
 
-对于大多数普通用户来说，最简单的方式是安装 Docker Desktop。
+对大多数普通用户来说，最简单的方式是安装 Docker Desktop。
 
 如果 Docker 没有安装，安装脚本会停止，并提示你先安装 Docker。
 
@@ -53,17 +59,41 @@ iwr https://raw.githubusercontent.com/ernestyu/openclaw-launcher/main/install.ps
 
 ---
 
+### 无交互安装
+
+可以通过环境变量完全脚本化安装流程：
+
+- `OPENCLAW_DIR` 设置安装目录
+- `OPENCLAW_MODE` 取值 `webui` 或 `headless`
+- `OPENCLAW_NO_EDIT=1` 跳过 `.env` 编辑提示
+
+示例：
+
+```bash
+OPENCLAW_DIR="$HOME/openclaw" OPENCLAW_MODE=webui OPENCLAW_NO_EDIT=1 \
+  curl -fsSL https://raw.githubusercontent.com/ernestyu/openclaw-launcher/main/install.sh | bash
+```
+
+```powershell
+$env:OPENCLAW_DIR="$HOME\openclaw"
+$env:OPENCLAW_MODE="webui"
+$env:OPENCLAW_NO_EDIT="1"
+iwr https://raw.githubusercontent.com/ernestyu/openclaw-launcher/main/install.ps1 -useb | iex
+```
+
+---
+
 ### 安装脚本会做什么
 
 安装脚本会自动完成这些事情：
 
 1. 检查 Docker 是否已经安装并运行
 2. 询问安装目录
-3. 下载 `compose.yaml`
-4. 下载 `.env.example`
-5. 创建 `.env`
-6. 创建 `data/` 和 `ssh/` 目录
-7. 可选地复制你本地的 `~/.ssh`
+3. 询问安装 Web UI 模式还是 Headless 模式
+4. 下载 `compose.yaml` 模板
+5. 下载 `.env.example`
+6. 创建 `.env`（如果不存在）
+7. 创建 `data/`
 8. 拉取镜像
 9. 启动 OpenClaw
 
@@ -73,11 +103,17 @@ iwr https://raw.githubusercontent.com/ernestyu/openclaw-launcher/main/install.ps
 
 这个仓库刻意保持得很简单，只包含少量文件：
 
-* `assets/compose.yaml`
-* `assets/.env.example`
-* `install.sh`
-* `install.ps1`
-* `README.md`
+- `assets/compose-webui.yaml`
+- `assets/compose-headless.yaml`
+- `assets/.env.example`
+- `CODE_OF_CONDUCT.md`
+- `CONTRIBUTING.md`
+- `install.sh`
+- `install.ps1`
+- `README.md`
+- `README_zh.md`
+- `SECURITY.md`
+- `LICENSE`
 
 安装时，脚本会把需要的文件下载到你本地选择的安装目录中。
 
@@ -135,19 +171,34 @@ docker compose down
 
 因为这个启动器会把相关内容都放在这个本地目录里，包括：
 
-* `compose.yaml`
-* `.env`
-* `data/`
-* `ssh/`
-
-所以不需要单独再写卸载脚本。
+- `compose.yaml`
+- `.env`
+- `data/`
 
 ---
 
 ### 说明
 
-* 这个启动器使用的公开镜像是 `ernestyu/openclaw-patched:latest`
-* 镜像已经是多平台镜像，Docker 会自动选择正确架构
-* 持久化数据保存在 `./data`
-* 如果复制了 SSH 文件，则保存在 `./ssh`
-* 整个启动器有意保持为轻量、简单、容易理解的形式
+- 启动器使用的公开镜像是 `ernestyu/openclaw-patched:latest`
+- Web UI 模式会绑定 `http://localhost:3060`
+- Headless 模式不暴露端口
+- 持久化数据保存在 `./data`
+- 整个启动器保持轻量、简单、易理解
+
+---
+
+### 许可证
+
+MIT，见 `LICENSE`。
+
+---
+
+### 贡献
+
+提交 PR 前请先阅读 `CONTRIBUTING.md`。
+
+---
+
+### 安全
+
+报告安全问题前请先阅读 `SECURITY.md`。
